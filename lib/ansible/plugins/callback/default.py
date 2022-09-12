@@ -45,6 +45,7 @@ class CallbackModule(CallbackBase):
         self._last_task_banner = None
         self._last_task_name = None
         self._task_type_cache = {}
+        self._task_tags = []
         super(CallbackModule, self).__init__()
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
@@ -84,6 +85,7 @@ class CallbackModule(CallbackBase):
 
             msg = "changed: [%s]" % (host_label,)
             color = C.COLOR_CHANGED
+            self._task_tags += result._task_fields['tags']
         else:
             if not self.get_option('display_ok_hosts'):
                 return
@@ -356,6 +358,9 @@ class CallbackModule(CallbackBase):
         if self._display.verbosity > 1:
             from os.path import basename
             self._display.banner("PLAYBOOK: %s" % basename(playbook._file_name))
+        self._task_tags = list( dict.fromkeys(self._task_tags) )
+        print("Collected tags: ", self._task_tags)
+
 
         # show CLI arguments
         if self._display.verbosity > 3:
